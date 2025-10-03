@@ -2,6 +2,11 @@ package main
 
 import "fmt"
 
+/*
+1. Выведите перечень деликатесов — продуктов дороже 500 рублей.
+2. Заказ выдан слайсом []string{"хлеб", "буженина", "сыр", "огурцы"}. Посчитайте стоимость заказа.
+*/
+
 func calcSum(prices map[string]float64, order []string) float64 {
 	var total float64 = 0
 	for _, product := range order {
