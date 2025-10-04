@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"calculator/stack"
+	"fmt"
+)
 
 const (
 	CmdAdd   = iota // сложить два числа в стеке (top-1) = (top-1) + top
@@ -22,7 +25,7 @@ func main() {
 		CmdLoad, 'А', CmdPush, 10230, CmdLoad, 'Б', CmdSub, CmdSub,
 		CmdPush, 1000, CmdDiv, CmdPrint}
 
-	var stack []int
+	var s stack.Stack
 	registers := make(map[rune]int)
 
 	for idx := 0; idx < len(program); idx++ {
@@ -30,55 +33,40 @@ func main() {
 
 		switch cmd {
 		case CmdPush:
-			stack = append(stack, program[idx+1])
+			s = s.Push(program[idx+1])
 			idx++
 		case CmdAdd:
-			top := len(stack) - 1 // индекс верхнего элемента стека
-			first := stack[top]   // получаем значение верхнего элемента
-			stack = stack[:top]   // удаляем верхний элемент из стека
-			top = len(stack) - 1  // индекс верхнего элемента стека
-			second := stack[top]  // получаем значение верхнего элемента
-			stack = stack[:top]   // удаляем верхний элемент из стека
-			stack = append(stack, first+second)
+			var x, y int
+			s, x = s.Pop()
+			s, y = s.Pop()
+			s = s.Push(x + y)
 		case CmdSub:
-			top := len(stack) - 1 // индекс верхнего элемента стека
-			y := stack[top]       // получаем значение верхнего элемента
-			stack = stack[:top]   // удаляем верхний элемент из стека
-			top = len(stack) - 1  // индекс верхнего элемента стека
-			x := stack[top]       // получаем значение верхнего элемента
-			stack = stack[:top]   // удаляем верхний элемент из стека
-			stack = append(stack, x-y)
+			var x, y int
+			s, y = s.Pop()
+			s, x = s.Pop()
+			s = s.Push(x - y)
 		case CmdMul:
-			top := len(stack) - 1 // индекс верхнего элемента стека
-			first := stack[top]   // получаем значение верхнего элемента
-			stack = stack[:top]   // удаляем верхний элемент из стека
-			top = len(stack) - 1  // индекс верхнего элемента стека
-			second := stack[top]  // получаем значение верхнего элемента
-			stack = stack[:top]   // удаляем верхний элемент из стека
-			stack = append(stack, first*second)
+			var x, y int
+			s, x = s.Pop()
+			s, y = s.Pop()
+			s = s.Push(x * y)
 		case CmdDiv:
-			top := len(stack) - 1 // индекс верхнего элемента стека
-			y := stack[top]       // получаем значение верхнего элемента
-			stack = stack[:top]   // удаляем верхний элемент из стека
-			top = len(stack) - 1  // индекс верхнего элемента стека
-			x := stack[top]       // получаем значение верхнего элемента
-			stack = stack[:top]   // удаляем верхний элемент из стека
-			stack = append(stack, x/y)
+			var x, y int
+			s, y = s.Pop()
+			s, x = s.Pop()
+			s = s.Push(x / y)
 		case CmdPrint:
-			top := len(stack) - 1 // индекс верхнего элемента стека
-			elem := stack[top]    // получаем значение верхнего элемента
-			fmt.Println(elem)     // печатаем значение верхнего элемента
+			elem := s.Pick()
+			fmt.Println(elem) // печатаем значение верхнего элемента
 		case CmdSave:
-			top := len(stack) - 1 // индекс верхнего элемента стека
-			elem := stack[top]    // получаем значение верхнего элемента
+			elem := s.Pick()
 			registers[rune(program[idx+1])] = elem
 			idx++
 		case CmdLoad:
-			stack = append(stack, registers[rune(program[idx+1])])
+			s = s.Push(registers[rune(program[idx+1])])
 			idx++
 		case CmdPop:
-			top := len(stack) - 1 // индекс верхнего элемента стека
-			stack = stack[:top]   // удаляем верхний элемент из стека
+			s, _ = s.Pop()
 		default:
 			continue
 		}
